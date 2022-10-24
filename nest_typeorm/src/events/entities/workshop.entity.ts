@@ -20,4 +20,10 @@ export class Workshop {
 
   @Column({ type: 'datetime' })
   createdAt: string;
+
+  @ManyToOne(() => Event, (event) => event.workshops, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  public workshop!: Event;
 }

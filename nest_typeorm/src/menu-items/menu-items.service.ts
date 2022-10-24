@@ -86,6 +86,20 @@ export class MenuItemsService {
     ]
   */
   async getMenuItems() {
-    throw new Error('TODO in task 3');
+    const allItems = await this.menuItemRepository.find();
+    const nestedData = this.generateHierarchicalData(allItems);
+    return nestedData;
+  }
+
+  generateHierarchicalData(data: any[], parentId = null) {
+    return data.reduce((r, e) => {
+      const obj = Object.assign({}, e);
+      if (parentId == e.parentId) {
+        const children = this.generateHierarchicalData(data, e.id);
+        if (children.length) obj.children = children;
+        r.push(obj);
+      }
+      return r;
+    }, []);
   }
 }

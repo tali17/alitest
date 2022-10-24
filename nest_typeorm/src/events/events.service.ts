@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Get, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
@@ -10,8 +10,12 @@ export class EventsService {
     private eventRepository: Repository<Event>,
   ) {}
 
-  getWarmupEvents() {
-    return this.eventRepository.find();
+  async getWarmupEvents() {
+    const evWorkshops = await this.eventRepository.find({
+      relations: ['workshops'],
+    });
+    console.log(evWorkshops);
+    return evWorkshops;
   }
 
   /* TODO: complete getEventsWithWorkshops so that it returns all events including the workshops
@@ -93,7 +97,14 @@ export class EventsService {
 
   @Get('events')
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
+    const allEvents = await this.eventRepository.find({
+      relations: ['workshops'],
+    });
+
+    const futureWorkshops = allEvents.filter(
+      (e) => new Date(e.workshops.start) > new Date(),
+    );
+    return futureWorkshops;
   }
 
   /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
